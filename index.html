@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F7F7F5" />
+    <title>王云康 · 建筑设计作品集 | Wang Yunkang — Architecture Portfolio</title>
+    <meta
+      name="description"
+      content="王云康，暨南大学建筑学本科。建筑设计作品集：剧场设计、运动健康社区改造、商业建筑改造、客运站设计等。"
+    />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23141414'/%3E%3Cpath d='M8 22 L16 8 L24 22' stroke='%23fff' stroke-width='1.6' fill='none'/%3E%3C/svg%3E" />
+    <!--
+      不引外链字体。
+      原先从 Google Fonts 拉 Inter + Noto Sans SC + Noto Serif SC 共 11 个字重，
+      首屏实测要 36 个字体文件 / 2.2 MB，光那份 CSS 就 213 KB，是首屏最大的一块开销。
+      而这几套字在目标机器上本来就装好了（base.css 的字体栈已按本机字体排好），
+      改走本地字体：零请求，中文渲染也更稳、不会闪字。
+    -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+.vite/
+
+# 本地日志与截图
+*.log
+shots/
+.vite-dev.log
+.vite-dev.err.log
+
+# 素材原始文件（体积大，不入库；用 scripts/process-images.py 从本地素材重新生成）
+# public/assets/ 是构建产物，如果需要提交部署产物可以去掉下面这行
+# public/assets/
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Python
+__pycache__/
+*.pyc

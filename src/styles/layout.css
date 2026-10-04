@@ -1,0 +1,439 @@
+/* =========================================================
+   布局层：版心 / 导航 / 侧边指示 / 光斑 / 段落标题
+   ========================================================= */
+
+.app {
+  position: relative;
+  isolation: isolate;
+}
+
+.wrap {
+  width: min(100% - var(--gutter) * 2, var(--wrap));
+  margin-inline: auto;
+}
+
+/* 极淡的底纹网格，提供「技术图纸」的秩序感 */
+.app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(20, 21, 26, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 21, 26, 0.028) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 20%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 20%, transparent 78%);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------- 顶部导航 ---------------- */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 80;
+  /* 毛玻璃用这几条过渡一起动，避免滚动时出现「突然换了一层」的断层感 */
+  transition:
+    background-color 0.55s var(--ease),
+    border-color 0.55s var(--ease),
+    box-shadow 0.55s var(--ease),
+    backdrop-filter 0.55s var(--ease),
+    -webkit-backdrop-filter 0.55s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+
+/* 滑过首屏后：固定悬浮 + 磨砂玻璃
+   亮度压到 0.62，让身后的画面真的透出来（太实就变成一块白板了）；
+   saturate 抬高让玻璃后面的颜色更通透；再加一条内高光模拟玻璃上沿。 */
+.nav.is-scrolled {
+  background-color: rgba(247, 247, 245, 0.62);
+  backdrop-filter: blur(22px) saturate(180%) brightness(1.04);
+  -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.04);
+  border-bottom-color: rgba(20, 21, 26, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 12px 32px -22px rgba(20, 21, 26, 0.3);
+}
+
+.nav__inner {
+  width: min(100% - var(--gutter) * 2, var(--wrap));
+  margin-inline: auto;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+/* 品牌 */
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nav__mark {
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+}
+
+.nav__name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.nav__name b {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.nav__name em {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  color: var(--ink-4);
+}
+
+/* 主链接 */
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav__link {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--ink-3);
+  transition:
+    color 0.35s var(--ease),
+    background 0.35s var(--ease);
+}
+
+.nav__linkNum {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+  transition: color 0.35s var(--ease);
+}
+
+.nav__linkEn {
+  display: none;
+}
+
+.nav__link:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.nav__link.is-active {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.nav__link.is-active .nav__linkNum {
+  color: var(--accent);
+}
+
+.nav__link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 2px;
+  height: 1px;
+  background: var(--ink);
+  transform-origin: left;
+  animation: navUnderline 0.5s var(--ease) both;
+}
+
+@keyframes navUnderline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* 右侧动作 */
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.nav__cta {
+  padding: 11px 20px;
+  font-size: 13.5px;
+}
+
+.nav__toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  position: relative;
+}
+
+.nav__toggle i {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: var(--ink);
+  transition: transform 0.35s var(--ease);
+}
+
+.nav__toggle i:first-child {
+  top: 16px;
+}
+.nav__toggle i:last-child {
+  top: 22px;
+}
+
+.nav.is-open .nav__toggle i:first-child {
+  transform: translateY(3px) rotate(45deg);
+}
+.nav.is-open .nav__toggle i:last-child {
+  transform: translateY(-3px) rotate(-45deg);
+}
+
+/* 滚动进度线 */
+.nav__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1.5px;
+  overflow: hidden;
+}
+
+.nav__progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 100%);
+  transform-origin: left;
+  transform: scaleX(0);
+  /* 不加 transition：数值由 rAF 逐帧写入，再加过渡等于每帧起一次动画，白烧合成时间 */
+}
+
+/* 抽屉（窄屏） */
+.nav__drawer {
+  display: none;
+  flex-direction: column;
+  /* 与导航栏同一套毛玻璃参数，展开时才不会像另一块面板 */
+  background-color: rgba(247, 247, 245, 0.72);
+  backdrop-filter: blur(22px) saturate(180%) brightness(1.04);
+  -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.04);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 18px 40px -30px rgba(20, 21, 26, 0.35);
+  padding: 8px 0 16px;
+}
+
+.nav__drawer a {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 15px var(--gutter);
+  border-bottom: 1px solid var(--line);
+  font-size: 16px;
+}
+
+/* ---------------- 右侧竖向指示 ---------------- */
+
+.rail {
+  position: fixed;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  pointer-events: auto;
+}
+
+.rail a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  height: 14px;
+  color: var(--ink-4);
+  transition: color 0.35s var(--ease);
+}
+
+.rail__num,
+.rail__label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(6px);
+  transition:
+    opacity 0.35s var(--ease),
+    transform 0.35s var(--ease);
+  white-space: nowrap;
+}
+
+.rail__label {
+  display: none;
+}
+
+.rail__dot {
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  transition:
+    width 0.4s var(--ease),
+    background 0.4s var(--ease);
+}
+
+.rail a:hover {
+  color: var(--ink-2);
+}
+
+.rail a:hover .rail__num,
+.rail a:hover .rail__label {
+  opacity: 1;
+  transform: none;
+}
+
+.rail a.is-active {
+  color: var(--ink);
+}
+
+.rail a.is-active .rail__num {
+  opacity: 1;
+  transform: none;
+  color: var(--accent);
+}
+
+.rail a.is-active .rail__dot {
+  width: 34px;
+}
+
+/* ---------------- 光标光斑 ---------------- */
+
+.spotlight {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+  background: radial-gradient(
+    circle,
+    rgba(47, 92, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  will-change: transform;
+}
+
+/* ---------------- 段落标题 ---------------- */
+
+.sec-head {
+  margin-bottom: clamp(40px, 4vw, 68px);
+}
+
+.sec-head__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.sec-head__num {
+  color: var(--accent);
+}
+
+.sec-head__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  max-width: 120px;
+}
+
+.sec-head__en {
+  color: var(--ink-4);
+}
+
+.sec-head__title {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: clamp(34px, 3.7vw, 62px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.sec-head__note {
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--ink-4);
+}
+
+.sec-head--center {
+  text-align: center;
+}
+
+.sec-head--center .sec-head__row,
+.sec-head--center .sec-head__title {
+  justify-content: center;
+}
+
+/* ---------------- 响应式 ---------------- */
+
+@media (max-width: 1500px) {
+  .rail {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .nav__links {
+    display: none;
+  }
+  .nav__toggle {
+    display: block;
+  }
+  .nav__drawer {
+    display: flex;
+  }
+  .nav__drawer[hidden] {
+    display: none;
+  }
+  .nav__cta {
+    display: none;
+  }
+}
