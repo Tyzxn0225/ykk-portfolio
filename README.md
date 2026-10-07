@@ -80,6 +80,34 @@ node scripts/verify-video.mjs --url http://127.0.0.1:5274/ --out shots
 
 ---
 
+## 离线查看
+
+**站点完全自包含**：不用 Google Fonts、不用任何 CDN、不发任何外部请求。
+用 `scripts/audit-offline.mjs` 把除 `127.0.0.1` 之外的所有请求拦掉，
+页面依旧 34 张图 0 破图、视频 `readyState=4` 正常播放、被拦截的外部请求 **0 个**。
+所以断网、内网、无外网的环境都能完整打开。
+
+```bash
+pnpm build:open      # 产出 dist-open/（引用改成相对路径）
+```
+
+然后**双击 `离线查看.cmd`**，它会用自带的 Python 起一个本地静态服务并自动开浏览器。
+不想敲命令、也不想依赖 Node 装没装 —— 这个脚本走 Python，只在找不到 Python 时才退回 `vite preview`。
+
+### ⚠️ 不能直接双击 `index.html`
+
+用 `file://` 打开 `dist/index.html` 或 `dist-open/index.html` 都会**白屏**。原因不是路径写错，而是
+**Chrome / Edge / Firefox 出于安全策略，禁止从 `file://` 加载 ES module 脚本**（跨源限制）。
+构建产物用的是 `<script type="module">`，必然被拦。
+
+这不是本项目能绕过的：要么起个本地服务（`离线查看.cmd` 就是干这个，
+它**不需要联网**），要么把 React 打包成非 module 的传统脚本并放弃 code splitting。
+
+> 浏览器缓存：用 `离线查看.cmd` 打开过一次后，即使之后不起服务、直接断网，
+> 浏览器通常也能从缓存加载。但这是缓存行为，不如起服务可靠。
+
+---
+
 ## 用手机打开（局域网）
 
 开发服务器与预览服务器默认监听 `0.0.0.0`，所以同一 Wi-Fi 下的手机可以直接访问：

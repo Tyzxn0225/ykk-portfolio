@@ -9,6 +9,7 @@
     "dev:local": "vite --host 127.0.0.1",
     "build": "node scripts/build-static.mjs",
     "build:pages": "node scripts/build-pages.mjs",
+    "build:open": "node scripts/build-portable.mjs",
     "preview": "vite preview",
     "assets": "python scripts/process-images.py",
     "check:assets": "node scripts/check-assets.mjs",
