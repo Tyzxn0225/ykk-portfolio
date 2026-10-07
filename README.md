@@ -15,15 +15,72 @@ pnpm install
 # 2. 启动开发预览（监听所有网卡，手机也能开）
 pnpm dev
 
-# 3. 生产构建与预览
-pnpm build
+# 3. 构建 + 本地预览
+pnpm build                                        # 根路径产物（Vercel / Netlify）
 node node_modules/vite/bin/vite.js preview --port 5274 --strictPort
 
 # 只想本机访问（不暴露到局域网）时：
 pnpm dev:local
 ```
 
-### 用手机打开
+---
+
+## 部署
+
+同一个代码库同时支持三种托管方式。**关键差别只有一处：资源基路径（base）。**
+base 不对时的表现很坑 —— **本地预览完全正常，线上白屏**。
+
+| 方式 | 构建命令 | base | 说明 |
+| --- | --- | --- | --- |
+| **Vercel / Netlify（拖拽）** | `pnpm build` | `/` | 站点在根域名下 |
+| **GitHub Pages** | `pnpm build:pages` | `/wyk-portfolio/` | project 站点在子路径下 |
+| 本地开发 | `pnpm dev` | `/` | |
+
+仓库名只在 `scripts/site-config.mjs` 里定义一次。
+
+### 方式一：Vercel / Netlify 拖拽部署（最快）
+
+```bash
+pnpm build
+```
+
+然后把 **`dist` 文件夹整个**拖进去：
+
+- **Vercel** → https://vercel.com/new
+- **Netlify** → https://app.netlify.com/drop
+
+> **拖的是 `dist` 目录本身，不是它里面的文件，也不是项目根目录。**
+> 拖项目根目录会失败：那两个平台会把它当"需要构建的源码工程"处理，
+> 而本项目没有为它们配置构建命令。
+>
+> 产物约 50 MB（42 MB 图片 + 8.6 MB 视频），首次上传会慢一点；
+> 之后由 Vercel/Netlify 的 CDN 接管。
+>
+> 拖拽部署不读 `vercel.json` / `netlify.toml`，所以本项目也不需要这两个文件。
+> 单页站点没有客户端路由，因此不需要 SPA rewrite 规则。
+
+### 方式二：GitHub Pages（自动）
+
+```bash
+git remote add origin https://github.com/<你的用户名>/wyk-portfolio.git
+git push -u origin main
+```
+
+推送后到仓库 **Settings → Pages → Source 选 "GitHub Actions"**。
+`.github/workflows/deploy-pages.yml` 会自动跑 `pnpm build:pages` 并发布。
+
+线上地址：`https://<你的用户名>.github.io/wyk-portfolio/`
+
+### 部署后自测
+
+```bash
+node scripts/diagnose.mjs   --url http://127.0.0.1:5274/ --width 1920 --height 1080
+node scripts/verify-video.mjs --url http://127.0.0.1:5274/ --out shots
+```
+
+---
+
+## 用手机打开（局域网）
 
 开发服务器与预览服务器默认监听 `0.0.0.0`，所以同一 Wi-Fi 下的手机可以直接访问：
 

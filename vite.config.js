@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
+import { PAGES_BASE } from './scripts/site-config.mjs'
 
 // 某些编辑器（含 DSH 的文件写入实现）会在源码目录里生成
 // `.<name>.<pid>.<uuid>.tmpdir/` 临时目录。Windows 上这些文件随时可能被
@@ -47,20 +48,30 @@ function probePages() {
 }
 
 /**
- * GitHub Pages 的 project 站点部署在 /<仓库名>/ 子路径下，
- * 这时所有资源都必须带这个前缀，否则线上白屏（本地却完全正常，很难查）。
+ * 资源基路径（base）—— 这是部署时最容易踩的坑：
+ * 路径前缀不对时**本地完全正常、线上白屏**，很难查。
  *
- * 本地开发与预览用 '/'，只有生产构建才切到子路径：
- * 这样 `pnpm dev` 仍是最简单的 http://127.0.0.1:5273/，
- * 而 `pnpm build` 产出的 dist/ 可以直接交给 GitHub Pages。
- * `vite preview` 也按生产 base 提供文件，所以本地就能验证子路径下的表现。
+ * 本项目要同时支持两种托管方式，而它们要求的 base 不同：
  *
- * 换仓库名 → 只改这一行。
+ *   Vercel / Netlify（根域名，拖拽部署）
+ *     → base 必须是 '/'，资源引用为 /assets/...
+ *
+ *   GitHub Pages（project 站点在 /<仓库名>/ 子路径）
+ *     → base 必须是 '/<仓库名>/'，否则 404
+ *
+ * 所以这里按构建方式切换，默认走根路径（Vercel / Netlify 拖拽即用的场景）：
+ *
+ *   pnpm build         → base '/'
+ *   pnpm build:pages   → base PAGES_BASE（GitHub Pages）
+ *   pnpm dev           → base '/'
+ *
+ * 换 GitHub 仓库名 → 只改 scripts/site-config.mjs 里的 REPO_NAME。
  */
-const REPO_NAME = 'wyk-portfolio'
-
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? `/${REPO_NAME}/` : '/',
+  // 默认 '/'（Vercel / Netlify 直接拖拽 dist 即可）。
+  // GitHub Pages 走 `pnpm build:pages`，那个脚本会设 VITE_BASE。
+  // 也允许直接 `VITE_BASE=/xxx/ pnpm build` 手动覆盖。
+  base: process.env.VITE_BASE || '/',
   plugins: [react(), probePages()],
   server: {
     port: 5273,

@@ -40,8 +40,12 @@ jobs:
 
       # 图片资源已在库里（public/assets），构建只是压缩 + 拷贝，
       # 不依赖 scripts/process-images.py 的原始素材目录。
+      #
+      # 必须用 build:pages：它会设 VITE_BASE=/<仓库名>/。
+      # 用普通的 pnpm build 会得到 base '/' 的产物，
+      # 在 Pages 的 /<仓库名>/ 子路径下资源全部 404（首页白屏）。
       - name: Build
-        run: pnpm build
+        run: pnpm build:pages
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
