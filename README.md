@@ -323,7 +323,7 @@ python scripts/slice-shots.py shots/mobile/390.jpg 1900
 
 当前素材要点：
 
-- 1920×1088 / 51.27 秒 / H.264（无音轨）/ 13.15 MB，来自剧院设计原始渲染
+- 1280×720 / 51.27 秒 / H.264（无音轨）/ 8.56 MB，来自剧院设计原始渲染
 - 已换成**无水印原片**，之前压水印用的 `.hero__edgeMask` 和跳过收尾卡的 `LOOP_END` 都已删除
 - 没有视频或加载失败时回退到 `assets/hero/poster-*`，不会破图或黑屏
 - `<video>` 设了 `fetchpriority="low"`，不与首屏字体/图片抢带宽；不挂 `poster`

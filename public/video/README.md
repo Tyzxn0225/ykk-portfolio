@@ -28,14 +28,18 @@ public/video/hero.mp4
 | 项目 | 值 |
 | --- | --- |
 | 来源 | 剧院设计原始渲染（无水印） |
-| 分辨率 | 1920 × 1088 |
+| 分辨率 | 1280 × 720 |
 | 帧率 | 24 fps |
 | 时长 | 51.27 秒 |
 | 编码 | H.264（无音轨） |
-| 大小 | 13.15 MB |
+| 大小 | 8.56 MB |
 
-处理方式：从原始 38 MB 的渲染里，用 ffmpeg 的 NVENC 编码器
-去音轨、压到约 2.1 Mbps（命令见下方「相关脚本」）。
+处理方式：从原始 38 MB 的 1080p 渲染里，用 ffmpeg 的 NVENC 编码器
+去音轨、压到 720p / 约 1.4 Mbps（命令见下方「相关脚本」）。
+
+> 为什么用 720p 而不是原片 1080p：GitHub Pages 的 CDN 拉大文件很慢，
+> 实测 13 MB 的 1080p 首屏视频要缓冲约 40 秒才开始播；压到 8.5 MB 后
+> 能明显加快起播。若换成更快的托管（如自己的 CDN / OSS），可再升回 1080p。
 
 ## 已知问题
 
@@ -56,8 +60,9 @@ node scripts/verify-video.mjs --url http://127.0.0.1:5273/ --out shots
 python scripts/check-watermark.py shots
 
 # 压缩原片的参考命令（本机 ffmpeg 在 D:\小飞宝宝\ACLOS\Cross\recorder-release\ffmpeg.exe）
-# ffmpeg -y -i 原片.mp4 -r 24 -c:v h264_nvenc -b:v 2000k -maxrate 2600k -bufsize 5200k \
-#        -pix_fmt yuv420p -movflags +faststart -an hero.mp4
+# 720p、约 1.4 Mbps：
+# ffmpeg -y -i 原片.mp4 -vf scale=1280:720 -r 24 -c:v h264_nvenc -b:v 1300k \
+#        -maxrate 1800k -bufsize 3600k -pix_fmt yuv420p -movflags +faststart -an hero.mp4
 ```
 
 ## 没有视频时的行为
