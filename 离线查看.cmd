@@ -22,13 +22,13 @@ if not exist "%SITE%\index.html" (
 set "PORT=5280"
 
 rem Bundled Python is the simplest static server and needs no dependencies.
-set "PY=C:\Users\wangyunkang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe"
+set "PY=%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe"
 if not exist "%PY%" (
   where python >nul 2>&1 && set "PY=python"
 )
 
 rem Fallback: bundled Node + vite preview
-set "NODE=C:\Users\wangyunkang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe"
+set "NODE=%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe"
 set "VITE=%~dp0node_modules\vite\bin\vite.js"
 
 echo  Serving : %SITE%

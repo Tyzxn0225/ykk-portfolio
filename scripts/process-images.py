@@ -9,12 +9,30 @@ import sys
 
 Image.MAX_IMAGE_PIXELS = None
 
-SRC = r"D:\01个人文件\个人简历及作品集\图片"
-SRC_PORTRAIT = r"D:\01个人文件\个人简历及作品集\形象照"
-# 案例临摹的图纸最早只存在于作品集 PDF 里，已单独抽出归档到「案例临摹」目录
-SRC_CASE = r"D:\01个人文件\个人简历及作品集\案例临摹"
-ROOT = r"C:\Users\wangyunkang\Documents\deepseek-harness\default-workspace\portfolio-site"
+# 项目根目录：从脚本自身位置推导，不写死绝对路径（可移植、不泄露用户名）
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "public", "assets")
+
+# 确保能 import 同目录下的 local_config（不管从哪个 cwd 运行）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# 本地素材目录：本机专属路径，从已被 gitignore 的 local_config.py 读取，
+# 不写进公开仓库（避免泄露个人磁盘路径，也让新克隆的人能自行配置）。
+# 新克隆的人复制 scripts/local_config.example.py 为 scripts/local_config.py 填写即可，
+# 或设置 PORTFOLIO_SRC / PORTFOLIO_SRC_PORTRAIT / PORTFOLIO_SRC_CASE 环境变量。
+try:
+    from local_config import SRC, SRC_PORTRAIT, SRC_CASE  # noqa: F401
+except ImportError:
+    SRC = os.environ.get("PORTFOLIO_SRC")
+    SRC_PORTRAIT = os.environ.get("PORTFOLIO_SRC_PORTRAIT", "")
+    SRC_CASE = os.environ.get("PORTFOLIO_SRC_CASE", "")
+    if not SRC:
+        print(
+            "缺少本地素材路径配置。请复制 scripts/local_config.example.py 为\n"
+            "scripts/local_config.py 并填写路径，或设置 PORTFOLIO_SRC 环境变量。",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
 # group -> { output name: (source file, widths, jpeg quality) }
 # 宽度档位必须与前端 <Pic widths={[...]}> 一一对应，否则浏览器会请求不存在的文件。
@@ -119,6 +137,8 @@ def save_variants(im, group, name, widths, quality, is_portrait=False):
 def resolve_source(srcfile):
     """按顺序在几个素材目录里找源文件，返回第一个存在的路径。"""
     for base in (SRC, SRC_CASE, SRC_PORTRAIT):
+        if not base:
+            continue
         p = os.path.join(base, srcfile)
         if os.path.exists(p):
             return p

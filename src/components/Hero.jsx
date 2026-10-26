@@ -10,18 +10,8 @@ import { profile, focusAreas } from '../data/content.js'
  * - 没有视频 / 加载失败时自动回退到高清渲染图，不会出现破图或黑屏
  * - 视频之上叠加浅色过渡带与网格，保证「明亮系 + 科技感」
  *
- * 关于源片：本片四角带有平台水印（左上 Logo、右上用户名+头像、左下用户名、
- * 右下头像+号码），是直接压进画面的，无法用 CSS 干净地去掉。
- * 现在靠上下两条过渡带把它们压到几乎看不见；如果能拿到无水印的源片，
- * 把 public/video/hero.mp4 换掉，并删掉下面的 .hero__edgeMask 即可。
+ * 源片已换成无水印的原始渲染（剧院设计，1920×1088），循环自然播放。
  */
-
-/**
- * 提前循环的时间点（秒）。
- * 源片 52s 之后是平台的个人主页收尾卡，不适合出现在网站首屏，
- * 所以到 51.5s 就回到开头。源片总长 53.77s。
- */
-const LOOP_END = 51.5
 
 export default function Hero() {
   const [videoOk, setVideoOk] = useState(false)
@@ -72,17 +62,6 @@ export default function Hero() {
     }
   }, [])
 
-  // 到 LOOP_END 就跳回开头，跳过平台的收尾卡
-  useEffect(() => {
-    const el = videoRef.current
-    if (!el) return
-    const onTimeUpdate = () => {
-      if (el.currentTime >= LOOP_END) el.currentTime = 0
-    }
-    el.addEventListener('timeupdate', onTimeUpdate)
-    return () => el.removeEventListener('timeupdate', onTimeUpdate)
-  }, [])
-
   const go = (event, id) => {
     event.preventDefault()
     const el = document.getElementById(id)
@@ -103,7 +82,7 @@ export default function Hero() {
             /* 首帧由 .hero__still 里的高清渲染图兜住（它压在视频之上），
                所以这里不必再挂 poster，能省掉一张 312 KB 的重复 JPEG。 */
             preload="auto"
-            /* 8.6 MB 的视频不该跟首屏的字体/图片抢带宽 */
+            /* 视频体积不小，不该跟首屏的字体/图片抢带宽 */
             fetchpriority="low"
             aria-hidden="true"
             tabIndex={-1}
@@ -124,10 +103,6 @@ export default function Hero() {
             />
           </div>
         </div>
-
-        {/* 源片四角带平台水印，用上下两条过渡带压住它。
-            换成无水印的源片后可以删掉这一层。 */}
-        <div className="hero__edgeMask" aria-hidden="true" />
 
         <div className="hero__scrim" aria-hidden="true" />
         <div className="hero__glow" aria-hidden="true" />

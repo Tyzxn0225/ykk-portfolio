@@ -292,11 +292,14 @@ python scripts/slice-shots.py shots/mobile/390.jpg 1900
 
 ## 图片资源流程
 
-原始素材在 `D:\01个人文件\个人简历及作品集\`。改图或换图：
+原始素材放在本机（路径配置在 `scripts/local_config.py`，该文件已被 gitignore，不进入仓库）。改图或换图：
 
 1. 编辑 `scripts/process-images.py` 里的 `PLAN`，把 `输出名` 映射到新源文件并给出宽度档位。
 2. 运行 `pnpm assets`（全部）或 `pnpm assets 项目名`（单项）。
 3. 校验 `node scripts/check-assets.mjs`。
+
+> 新克隆的人先复制 `scripts/local_config.example.py` 为 `scripts/local_config.py`
+> 并填上本地素材路径，或设置 `PORTFOLIO_SRC` 等环境变量（见 `process-images.py` 顶部注释）。
 
 ### 宽度档位（重要）
 
@@ -320,10 +323,8 @@ python scripts/slice-shots.py shots/mobile/390.jpg 1900
 
 当前素材要点：
 
-- 1270×720 / 53.77 秒 / H.264 / 8.61 MB
-- 源片 52s 之后是平台个人主页收尾卡，已在 `Hero.jsx` 设 `LOOP_END = 51.5` 提前循环
-- **源片四角带平台水印（烧进画面）**，靠上下过渡带压制，底部两块在部分画面仍可见；
-  细节与可选方案见 `public/video/README.md`
+- 1920×1088 / 51.27 秒 / H.264（无音轨）/ 13.15 MB，来自剧院设计原始渲染
+- 已换成**无水印原片**，之前压水印用的 `.hero__edgeMask` 和跳过收尾卡的 `LOOP_END` 都已删除
 - 没有视频或加载失败时回退到 `assets/hero/poster-*`，不会破图或黑屏
 - `<video>` 设了 `fetchpriority="low"`，不与首屏字体/图片抢带宽；不挂 `poster`
   （`.hero__still` 已压着同一张图，poster 只会多请求一次）
@@ -433,7 +434,6 @@ python scripts/probe-video.py public/video/hero.mp4
 
 - [ ] 运动健康社区改造的**垂直交通分析图**（现借用商业改造那张）
 - [ ] 商业建筑改造的**效果图**（现只有立面图与总平，卡片封面偏空）
-- [ ] 首页视频换成**无水印源片**，换后删掉 `.hero__edgeMask`
 - [ ] 案例临摹的形体研究小样分辨率偏低（644×953），有高清版可替换
 - [ ] 各项目的 `year` / `location` 按作品集页码推断，请核对成真实信息
 - [ ] 移动端已适配到 320px，但交互（灯箱手势滑动切换）尚未做

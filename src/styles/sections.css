@@ -73,31 +73,6 @@
   transform-origin: 55% 50%;
 }
 
-/* 源片四角带平台水印，用上下两条过渡带把它压住。
-   上带同时承担与导航栏的衔接；下带同时保证底部文字可读。
-   换到无水印源片后，把这一层删掉、并相应减弱 .hero__scrim 即可。 */
-.hero__edgeMask {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(247, 247, 245, 0.96) 0%,
-      rgba(247, 247, 245, 0.88) 4.5%,
-      rgba(247, 247, 245, 0.5) 10%,
-      rgba(247, 247, 245, 0) 17%
-    ),
-    linear-gradient(
-      0deg,
-      rgba(247, 247, 245, 0.97) 0%,
-      rgba(247, 247, 245, 0.9) 5.5%,
-      rgba(247, 247, 245, 0.55) 11%,
-      rgba(247, 247, 245, 0) 19%
-    );
-}
-
 @keyframes heroDrift {
   from {
     transform: scale(1.045) translate3d(0, 0, 0);

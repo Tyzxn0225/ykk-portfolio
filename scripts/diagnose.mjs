@@ -48,6 +48,8 @@ async function main() {
   const pending = new Map()
   const consoleErrors = []
   const failedRequests = []
+  /** requestId -> URL，用于让 loadingFailed 能说清是哪个文件失败 */
+  const reqUrls = new Map()
   let ws
 
   try {
@@ -87,8 +89,13 @@ async function main() {
       if (msg.method === 'Runtime.exceptionThrown') {
         consoleErrors.push('EXCEPTION: ' + (msg.params.exceptionDetails?.exception?.description || ''))
       }
+      if (msg.method === 'Network.requestWillBeSent') {
+        reqUrls.set(msg.params.requestId, msg.params.request.url)
+      }
       if (msg.method === 'Network.loadingFailed') {
-        failedRequests.push(`${msg.params.type} ${msg.params.errorText} blocked=${msg.params.blockedReason || '-'}`)
+        // 带上 URL：否则只知道「有个请求失败了」，定位不到是哪个文件
+        const url = reqUrls.get(msg.params.requestId) || '(未知 URL)'
+        failedRequests.push(`${msg.params.type} ${msg.params.errorText} → ${url}`)
       }
       if (msg.method === 'Network.responseReceived' && msg.params.response.status >= 400) {
         failedRequests.push(`HTTP ${msg.params.response.status} ${msg.params.response.url}`)
@@ -159,9 +166,14 @@ async function main() {
     console.log(JSON.stringify(report.pics, null, 2))
 
     console.log('\n=== IMAGES ===', report.imgs.length)
-    const broken = report.imgs.filter((i) => !i.complete || i.natural.startsWith('0x'))
+    // 判定「坏图」时只认「已经加载完但尺寸为 0」（真 404/解码失败）。
+    // 不能用 `!complete` —— 懒加载的图在滚出视口后会被浏览器丢弃，
+    // complete 又变回 false，那样会把正常图片误报成破图
+    // （在公网慢速环境下尤其容易触发，曾因此误报 31 张）。
+    const isBroken = (i) => i.complete && i.natural.startsWith('0x')
+    const broken = report.imgs.filter(isBroken)
     report.imgs.forEach((i) => {
-      const flag = !i.complete || i.natural.startsWith('0x') ? 'BROKEN' : 'ok    '
+      const flag = isBroken(i) ? 'BROKEN' : i.complete ? 'ok    ' : 'pending'
       console.log(`${flag} ${String(i.natural).padEnd(11)} box ${i.w}x${i.h}  ${i.src}`)
     })
 

@@ -20,7 +20,7 @@ setlocal
 cd /d "%~dp0"
 
 set "PORT=5280"
-set "PY=C:\Users\wangyunkang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe"
+set "PY=%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe"
 if not exist "%PY%" set "PY=python"
 
 set "SITE=%~dp0dist-open"

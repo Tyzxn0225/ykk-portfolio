@@ -10,7 +10,7 @@ echo  ==========================================
 echo.
 
 rem Use the bundled Node runtime so a system-wide install is not required.
-set "NODE=C:\Users\wangyunkang\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe"
+set "NODE=%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe"
 set "VITE=%~dp0node_modules\vite\bin\vite.js"
 
 if not exist "%NODE%" (
