@@ -42,26 +42,6 @@ export default function Hero() {
     }
   }, [])
 
-  // 只在真的能取到视频时才启用 <video>，避免出现破图
-  useEffect(() => {
-    const el = videoRef.current
-    if (!el) return
-    const onReady = () => setVideoOk(true)
-    const onError = () => setVideoOk(false)
-    el.addEventListener('loadeddata', onReady)
-    el.addEventListener('error', onError)
-    // 触发一次探测
-    try {
-      el.load()
-    } catch {
-      /* noop */
-    }
-    return () => {
-      el.removeEventListener('loadeddata', onReady)
-      el.removeEventListener('error', onError)
-    }
-  }, [])
-
   const go = (event, id) => {
     event.preventDefault()
     const el = document.getElementById(id)
@@ -79,6 +59,8 @@ export default function Hero() {
             loop
             playsInline
             autoPlay
+            onLoadedData={() => setVideoOk(true)}
+            onError={() => setVideoOk(false)}
             /* 首帧由 .hero__still 里的高清渲染图兜住（它压在视频之上），
                所以这里不必再挂 poster，能省掉一张 312 KB 的重复 JPEG。 */
             preload="auto"
